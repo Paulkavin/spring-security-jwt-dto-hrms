@@ -3,14 +3,11 @@ package com.hrms.dto;
 import lombok.*;
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class EmployeeResponseDTO {
 
     private Long id;

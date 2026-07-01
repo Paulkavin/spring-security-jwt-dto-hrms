@@ -2,10 +2,13 @@ package com.hrms.controller;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.hrms.dto.EmployeeRequestDTO;
 import com.hrms.dto.EmployeeResponseDTO;
+import com.hrms.security.CustomUserDetails;
 import com.hrms.service.EmployeeService;
 
 import jakarta.validation.Valid;
@@ -20,30 +23,43 @@ public class EmployeeController {
     private final EmployeeService employeeService;
      
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public EmployeeResponseDTO createEmployee(@Valid @RequestBody EmployeeRequestDTO dto){
          return employeeService.createEmployee(dto);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public List<EmployeeResponseDTO> getAllEmployees(){
 return employeeService.getAllEmployees();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public EmployeeResponseDTO getEmployee(@PathVariable Long id){
         return employeeService.getEmployeeById(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public EmployeeResponseDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDTO dto ){
         return employeeService.updateEmployeeId(id, dto);
     }
 
+    
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // spring automatically adds "ROLE_" before
     public String deleteEmployee(@PathVariable Long id){
         employeeService.deleteEmployee(id);
         return "Employee Deleted Successfully!";
     }
+
+    @GetMapping("/me")
+    //Authentication Principal - makes the employee see themself alone
+    public EmployeeResponseDTO myProfile(@AuthenticationPrincipal CustomUserDetails user){
+        return employeeService.getProfile(user.getUsername());
+    }
+
 
 
 }
