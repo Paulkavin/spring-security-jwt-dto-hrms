@@ -23,7 +23,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             .email(dto.getEmail())
             .password(passwordEncoder.encode(dto.getPassword())) // Encoding password
             .department(dto.getDepartment())
-            .role(dto.getRole())
             .phone(dto.getPhone())
             .salary(dto.getSalary())
             .joiningDate(dto.getJoiningDate())
@@ -38,7 +37,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             .lastName(employee.getLastName())
             .email(employee.getEmail())
             .department(employee.getDepartment())
-            .role(employee.getRole())
             .phone(employee.getPhone())
             .salary(employee.getSalary())
             .joiningDate(employee.getJoiningDate())

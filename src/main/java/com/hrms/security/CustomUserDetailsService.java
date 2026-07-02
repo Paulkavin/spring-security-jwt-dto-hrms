@@ -4,6 +4,12 @@ import com.hrms.entity.Employee;
 import com.hrms.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +34,32 @@ public class CustomUserDetailsService
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found"));
 
-        return new CustomUserDetails(employee);
+        // return new CustomUserDetails(employee);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+employee.getRoles().forEach(role -> {
+
+    authorities.add(
+            new SimpleGrantedAuthority("ROLE_" + role.getName())
+    );
+
+    role.getPermissions().forEach(permission -> {
+
+        String authority =
+                permission.getModule().getName()
+                        + "_"
+                        + permission.getAction();
+
+        authorities.add(
+                new SimpleGrantedAuthority(authority)
+        );
+
+    });
+
+});
+
+authorities.forEach(a -> System.out.println(a.getAuthority()));
+return new CustomUserDetails(employee, authorities);
 
     }
 

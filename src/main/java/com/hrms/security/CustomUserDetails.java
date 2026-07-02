@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 /**
@@ -15,13 +16,21 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final Employee employee;
-
+     private final Collection<? extends GrantedAuthority> authorities;
+    /* Old
     @Override
     //returns roles/permissions
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // For RBAC , spring reads like ROLE +----
         return List.of(new SimpleGrantedAuthority("ROLE_"+employee.getRole()));
     }
+ */
+
+    @Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+
+    return authorities;
+}
 
     @Override
     public String getPassword() {
@@ -53,3 +62,20 @@ public class CustomUserDetails implements UserDetails {
         return "ACTIVE".equalsIgnoreCase(employee.getStatus());
     }
 }
+
+/* New System
+Employee
+
+↓
+
+Roles
+
+↓
+
+Permissions
+
+↓
+
+Authorities
+    
+*/

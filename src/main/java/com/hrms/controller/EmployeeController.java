@@ -23,13 +23,13 @@ public class EmployeeController {
     private final EmployeeService employeeService;
      
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAuthority('EMPLOYEE_CREATE')")
     public EmployeeResponseDTO createEmployee(@Valid @RequestBody EmployeeRequestDTO dto){
          return employeeService.createEmployee(dto);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAuthority('EMPLOYEE_READ')")
     public List<EmployeeResponseDTO> getAllEmployees(){
 return employeeService.getAllEmployees();
     }
@@ -41,14 +41,14 @@ return employeeService.getAllEmployees();
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
     public EmployeeResponseDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDTO dto ){
         return employeeService.updateEmployeeId(id, dto);
     }
 
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // spring automatically adds "ROLE_" before
+    @PreAuthorize("hasAuthority('EMPLOYEE_DELETE')") 
     public String deleteEmployee(@PathVariable Long id){
         employeeService.deleteEmployee(id);
         return "Employee Deleted Successfully!";

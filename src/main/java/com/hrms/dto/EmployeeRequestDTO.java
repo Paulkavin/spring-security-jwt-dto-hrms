@@ -20,7 +20,7 @@ public class EmployeeRequestDTO {
     
     private String department;
 
-    private String role;
+    // private String role;
 
     private String phone;
     

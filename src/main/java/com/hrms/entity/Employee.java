@@ -2,14 +2,16 @@ package com.hrms.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="employees")
 @Getter
 @Setter
 @NoArgsConstructor //Frameworks like Hibernate/JPA require a no-argument constructor to instantiate database entities before filling them with data.
-@AllArgsConstructor // t allows you to initialize all object properties at the moment of creation in a single line of code
-@Builder // helpsto avoid multiple over loaded constructor , creates complex objects using method chaining.
+@AllArgsConstructor // it allows you to initialize all object properties at the moment of creation in a single line of code
+@Builder // helps to avoid multiple over loaded constructor , creates complex objects using method chaining.
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,16 @@ public class Employee {
     private String password;
     private String department;
 
-    private String role;
+    
+    // private String role;
+    @ManyToMany(fetch = FetchType.LAZY)
+@JoinTable(
+        name = "employee_roles",
+        joinColumns = @JoinColumn(name = "employee_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+)
+@Builder.Default // without using it new HashSet will be ignored
+private Set<Role> roles = new HashSet<>();
 
     private String phone;
     
