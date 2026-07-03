@@ -31,13 +31,14 @@ public class Employee {
 
     
     // private String role;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
 @JoinTable(
         name = "employee_roles",
         joinColumns = @JoinColumn(name = "employee_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
 )
 @Builder.Default // without using it new HashSet will be ignored
+
 private Set<Role> roles = new HashSet<>();
 
     private String phone;

@@ -60,6 +60,14 @@ return employeeService.getAllEmployees();
         return employeeService.getProfile(user.getUsername());
     }
 
+    @PostMapping("/{id}/roles")
+@PreAuthorize("hasRole('ADMIN')")
+public EmployeeResponseDTO assignRoles(
+        @PathVariable Long id,
+        @RequestBody List<String> roleNames) {
+
+    return employeeService.assignRoles(id, roleNames);
+}
 
 
 }

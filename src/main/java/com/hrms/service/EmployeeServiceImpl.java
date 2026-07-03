@@ -11,12 +11,19 @@ import com.hrms.entity.Employee;
 import com.hrms.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+import java.util.HashSet;
+import com.hrms.entity.Role;
+import com.hrms.repository.RoleRepository;
 
 @Service
 @RequiredArgsConstructor //Alternate to @Autowired
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+
+
     private Employee mapToEntity(EmployeeRequestDTO dto){
         return Employee.builder().firstName(dto.getFirstName())
             .lastName(dto.getLastName())
@@ -52,9 +59,17 @@ public class EmployeeServiceImpl implements EmployeeService {
        
         Employee employee= mapToEntity(dto);
 
-        Employee savedEmployee = employeeRepository.save(employee);
+      // Get default role
+    Role employeeRole = roleRepository.findByName("EMPLOYEE")
+        .orElseThrow(() -> new RuntimeException("Default EMPLOYEE role not found"));
 
-        return mapToResponse(savedEmployee);
+    // Assign role
+    employee.getRoles().add(employeeRole);
+
+    // Save
+    Employee savedEmployee = employeeRepository.save(employee);
+
+return mapToResponse(savedEmployee);
 
     };
 
@@ -102,6 +117,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("Employee Not Found"));
         return mapToResponse(employee);
     }
+
+    //Add roles
+    @Override
+public EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames) {
+
+    Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+    Set<Role> roles = new HashSet<>();
+
+    for (String roleName : roleNames) {
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() ->
+                        new RuntimeException("Role not found : " + roleName));
+
+        roles.add(role);
+    }
+
+    employee.setRoles(roles);
+
+    Employee updatedEmployee = employeeRepository.save(employee);
+
+    return mapToResponse(updatedEmployee);
+}
         
     }
 

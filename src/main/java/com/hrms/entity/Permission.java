@@ -16,7 +16,7 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //LAZY - loads when necessary
-    @ManyToOne(fetch = FetchType.LAZY) // Module - many permissions to one module
+    @ManyToOne(fetch = FetchType.EAGER) // Module - many permissions to one module
     @JoinColumn(name="module_id",nullable=false)
     private Module module;
 

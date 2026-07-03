@@ -18,7 +18,9 @@ public interface EmployeeService {
     void deleteEmployee(Long id);
     EmployeeResponseDTO getProfile(String email);
 
-
+    //for adding roles
+    EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames);
+    
 
 }
 
