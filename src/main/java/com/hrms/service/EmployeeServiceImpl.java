@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import com.hrms.dto.EmployeeRequestDTO;
 import com.hrms.dto.EmployeeResponseDTO;
 import com.hrms.entity.Employee;
+import com.hrms.entity.Permission;
+
 import com.hrms.repository.EmployeeRepository;
+import com.hrms.repository.PermissionRepository;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
@@ -22,6 +26,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+
 
 
     private Employee mapToEntity(EmployeeRequestDTO dto){
@@ -143,6 +149,58 @@ public EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames) 
     return mapToResponse(updatedEmployee);
 }
         
+    //ASSIGN PERMISSIONS
+    @Override
+public void assignPermissionToEmployee(Long employeeId, Long permissionId) {
+
+    // Find Employee
+    Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() ->
+                    new RuntimeException("Employee not found"));
+
+    // Find Permission
+    Permission permission = permissionRepository.findById(permissionId)
+            .orElseThrow(() ->
+                    new RuntimeException("Permission not found"));
+
+    // Check duplicate assignment
+    if (employee.getDirectPermissions().contains(permission)) {
+        throw new RuntimeException("Permission already assigned to employee");
+    }
+
+    // Assign Permission
+    employee.getDirectPermissions().add(permission);
+
+    // Save
+    employeeRepository.save(employee);
+}
+
+    @Override
+public void removePermissionFromEmployee(
+        Long employeeId,
+        Long permissionId) {
+
+    // Find Employee
+    Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() ->
+                    new RuntimeException("Employee not found"));
+
+    // Find Permission
+    Permission permission = permissionRepository.findById(permissionId)
+            .orElseThrow(() ->
+                    new RuntimeException("Permission not found"));
+
+    // Check whether permission exists
+    if (!employee.getDirectPermissions().contains(permission)) {
+        throw new RuntimeException("Permission is not assigned to this employee");
+    }
+
+    // Remove permission
+    employee.getDirectPermissions().remove(permission);
+
+    // Save
+    employeeRepository.save(employee);
+}
     }
 
 

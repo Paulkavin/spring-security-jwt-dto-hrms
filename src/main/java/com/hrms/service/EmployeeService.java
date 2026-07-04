@@ -21,6 +21,18 @@ public interface EmployeeService {
     //for adding roles
     EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames);
     
+    // For Assign Extra Permissions
+   void assignPermissionToEmployee(
+        Long employeeId,
+        Long permissionId);
+
+    // Remove Permissions
+
+    void removePermissionFromEmployee(
+        Long employeeId,
+        Long permissionId);
+
+
 
 }
 

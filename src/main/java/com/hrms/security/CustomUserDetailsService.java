@@ -38,7 +38,9 @@ public class CustomUserDetailsService
         // return new CustomUserDetails(employee) with duplicates (if set used);
         // List<GrantedAuthority> authorities = new ArrayList<>();
            Set<GrantedAuthority> authorities = new HashSet<>();    
-employee.getRoles().forEach(role -> {
+    
+   //Role Authorites
+    employee.getRoles().forEach(role -> {
 
     authorities.add(
             new SimpleGrantedAuthority("ROLE_" + role.getName())
@@ -61,9 +63,32 @@ employee.getRoles().forEach(role -> {
 
 });
 
+// Direct Permissions
+        employee.getDirectPermissions().forEach(permission -> {
+
+        authorities.add(
+            new SimpleGrantedAuthority(permission.getAuthority())
+    );
+
+});
+
 authorities.forEach(a -> System.out.println(a.getAuthority()));
 return new CustomUserDetails(employee, authorities);
 
     }
 
 }
+
+/**Latest Flow
+ * User Login
+      ↓
+Load Role Permissions
+      +
+Load Employee Direct Permissions
+      ↓
+Merge
+      ↓
+JWT
+      ↓
+@PreAuthorize()
+ */

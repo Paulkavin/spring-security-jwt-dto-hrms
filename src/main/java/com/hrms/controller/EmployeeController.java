@@ -2,10 +2,12 @@ package com.hrms.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.hrms.dto.AssignPermissionRequestDTO;
 import com.hrms.dto.EmployeeRequestDTO;
 import com.hrms.dto.EmployeeResponseDTO;
 import com.hrms.security.CustomUserDetails;
@@ -69,6 +71,32 @@ public EmployeeResponseDTO assignRoles(
     return employeeService.assignRoles(id, roleNames);
 }
 
+    @PostMapping("/{employeeId}/permissions")
+@PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
+public ResponseEntity<String> assignPermissionToEmployee(
+        @PathVariable Long employeeId,
+        @RequestBody AssignPermissionRequestDTO request) {
+
+    employeeService.assignPermissionToEmployee(
+            employeeId,
+            request.getPermissionId());
+
+    return ResponseEntity.ok("Permission assigned successfully.");
+}
+
+// Delete Permissions
+@DeleteMapping("/{employeeId}/permissions/{permissionId}")
+@PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
+public ResponseEntity<String> removePermissionFromEmployee(
+        @PathVariable Long employeeId,
+        @PathVariable Long permissionId) {
+
+    employeeService.removePermissionFromEmployee(
+            employeeId,
+            permissionId);
+
+    return ResponseEntity.ok("Permission removed successfully.");
+}
 
 }
 

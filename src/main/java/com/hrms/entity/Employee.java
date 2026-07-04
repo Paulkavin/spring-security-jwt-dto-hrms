@@ -30,6 +30,7 @@ public class Employee {
     private String department;
 
     
+    
     // private String role;
     @ManyToMany(fetch = FetchType.EAGER)
 @JoinTable(
@@ -37,9 +38,19 @@ public class Employee {
         joinColumns = @JoinColumn(name = "employee_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
 )
+
 @Builder.Default // without using it new HashSet will be ignored
 
 private Set<Role> roles = new HashSet<>();
+
+//Direct Permissions
+@ManyToMany(fetch = FetchType.EAGER)
+@JoinTable(
+        name = "employee_permissions",
+        joinColumns = @JoinColumn(name = "employee_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+)
+private Set<Permission> directPermissions = new HashSet<>();
 
     private String phone;
     
