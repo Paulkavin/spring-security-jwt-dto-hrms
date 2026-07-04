@@ -6,7 +6,8 @@ import com.hrms.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,9 +35,9 @@ public class CustomUserDetailsService
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found"));
 
-        // return new CustomUserDetails(employee);
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
+        // return new CustomUserDetails(employee) with duplicates (if set used);
+        // List<GrantedAuthority> authorities = new ArrayList<>();
+           Set<GrantedAuthority> authorities = new HashSet<>();    
 employee.getRoles().forEach(role -> {
 
     authorities.add(
@@ -45,11 +46,13 @@ employee.getRoles().forEach(role -> {
 
     role.getPermissions().forEach(permission -> {
 
+        /* 
         String authority =
                 permission.getModule().getName()
                         + "_"
                         + permission.getAction();
-
+        */
+        String authority =permission.getAuthority();
         authorities.add(
                 new SimpleGrantedAuthority(authority)
         );

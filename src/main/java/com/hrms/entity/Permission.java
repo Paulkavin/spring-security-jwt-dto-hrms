@@ -15,7 +15,18 @@ public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //LAZY - loads when necessary
+
+    @Column(nullable=false, unique=true)
+    private String authority;
+
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "module_id", nullable = false)
+    private Module module;
+
+
+/* *
     @ManyToOne(fetch = FetchType.EAGER) // Module - many permissions to one module
     @JoinColumn(name="module_id",nullable=false)
     private Module module;
@@ -28,4 +39,6 @@ public class Permission {
 
     @ManyToMany(mappedBy = "permissions")
 private Set<Role> roles = new HashSet<>();
+*/
+
 }
