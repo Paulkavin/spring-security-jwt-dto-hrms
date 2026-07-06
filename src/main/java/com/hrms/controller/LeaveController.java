@@ -70,5 +70,32 @@ public class LeaveController {
                 leaveService.rejectLeave(leaveId));
     }
 
+    @PutMapping("/{leaveId}")
+        @PreAuthorize("hasAuthority('LEAVE_UPDATE')")
+        public ResponseEntity<LeaveResponseDTO> updateLeave(
+        @PathVariable Long leaveId,
+        @RequestBody LeaveRequestDTO request,
+        Authentication authentication) {
+
+    return ResponseEntity.ok(
+            leaveService.updateLeave(
+                    leaveId,
+                    request,
+                    authentication.getName()));
+}
+
+        @DeleteMapping("/{leaveId}")
+@PreAuthorize("hasAuthority('LEAVE_DELETE')")
+public ResponseEntity<String> deleteLeave(
+        @PathVariable Long leaveId,
+        Authentication authentication) {
+
+    leaveService.deleteLeave(
+            leaveId,
+            authentication.getName());
+
+    return ResponseEntity.ok("Leave deleted successfully.");
+}
+
 }
 

@@ -20,4 +20,12 @@ public interface LeaveService {
 
     List<LeaveResponseDTO> getAllLeaves();
 
+    LeaveResponseDTO updateLeave(
+        Long leaveId,
+        LeaveRequestDTO request,
+        String employeeEmail);
+
+void deleteLeave(
+        Long leaveId,
+        String employeeEmail);
 }
