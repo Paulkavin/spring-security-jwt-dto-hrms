@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.Set;
 import java.util.HashSet;
 import com.hrms.entity.Role;
+import com.hrms.exception.DuplicateResourceException;
+import com.hrms.exception.ResourceNotFoundException;
 import com.hrms.repository.RoleRepository;
 
 @Service
@@ -60,14 +62,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO dto){
         if(employeeRepository.existsByEmail(dto.getEmail())){
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException ("Email already exists");
         }
        
         Employee employee= mapToEntity(dto);
 
       // Get default role
     Role employeeRole = roleRepository.findByName("EMPLOYEE")
-        .orElseThrow(() -> new RuntimeException("Default EMPLOYEE role not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Default EMPLOYEE role not found"));
 
     // Assign role
     employee.getRoles().add(employeeRole);
@@ -88,14 +90,14 @@ return mapToResponse(savedEmployee);
     //READ By ID
     @Override
     public  EmployeeResponseDTO getEmployeeById(Long id){
-        Employee employee= employeeRepository.findById(id).orElseThrow(()-> new RuntimeException("Employee not Found"));//can use .get() as well
+        Employee employee= employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employee not Found"));//can use .get() as well
         return mapToResponse(employee);
      }
 
      //UPDATE
      @Override
     public EmployeeResponseDTO updateEmployeeId(Long id, EmployeeRequestDTO dto){
-       Employee employee = employeeRepository.findById(id).orElseThrow(()-> new RuntimeException("Employee Not Found"));
+       Employee employee = employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employee not Found"));
       employee.setFirstName(dto.getFirstName());
       employee.setLastName(dto.getLastName());
     employee.setDepartment(dto.getDepartment());
@@ -111,7 +113,7 @@ return mapToResponse(savedEmployee);
 //DELETE
 @Override
  public void deleteEmployee(Long id){
-    Employee employee = employeeRepository.findById(id).orElseThrow(()-> new RuntimeException("Employee Not Found"));
+    Employee employee = employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employee not Found"));
 
     employeeRepository.delete(employee);
 
@@ -120,7 +122,7 @@ return mapToResponse(savedEmployee);
     //PROFILE
     @Override
     public EmployeeResponseDTO getProfile(String email){
-        Employee employee = employeeRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("Employee Not Found"));
+        Employee employee = employeeRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException("Employee not Found"));
         return mapToResponse(employee);
     }
 
@@ -129,7 +131,7 @@ return mapToResponse(savedEmployee);
 public EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames) {
 
     Employee employee = employeeRepository.findById(employeeId)
-            .orElseThrow(() -> new RuntimeException("Employee not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Employee not Found"));
 
     Set<Role> roles = new HashSet<>();
 
@@ -137,7 +139,7 @@ public EmployeeResponseDTO assignRoles(Long employeeId, List<String> roleNames) 
 
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() ->
-                        new RuntimeException("Role not found : " + roleName));
+                        new ResourceNotFoundException("Role not found : " + roleName));
 
         roles.add(role);
     }
@@ -156,16 +158,16 @@ public void assignPermissionToEmployee(Long employeeId, Long permissionId) {
     // Find Employee
     Employee employee = employeeRepository.findById(employeeId)
             .orElseThrow(() ->
-                    new RuntimeException("Employee not found"));
+                    new ResourceNotFoundException("Employee not Found"));
 
     // Find Permission
     Permission permission = permissionRepository.findById(permissionId)
             .orElseThrow(() ->
-                    new RuntimeException("Permission not found"));
+                    new ResourceNotFoundException("Permission not found"));
 
     // Check duplicate assignment
     if (employee.getDirectPermissions().contains(permission)) {
-        throw new RuntimeException("Permission already assigned to employee");
+        throw new DuplicateResourceException("Permission already assigned to employee");
     }
 
     // Assign Permission
@@ -183,12 +185,12 @@ public void removePermissionFromEmployee(
     // Find Employee
     Employee employee = employeeRepository.findById(employeeId)
             .orElseThrow(() ->
-                    new RuntimeException("Employee not found"));
+                    new ResourceNotFoundException("Employee not Found"));
 
     // Find Permission
     Permission permission = permissionRepository.findById(permissionId)
             .orElseThrow(() ->
-                    new RuntimeException("Permission not found"));
+                    new ResourceNotFoundException("Permission not found"));
 
     // Check whether permission exists
     if (!employee.getDirectPermissions().contains(permission)) {

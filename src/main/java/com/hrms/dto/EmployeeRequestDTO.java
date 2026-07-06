@@ -30,3 +30,12 @@ public class EmployeeRequestDTO {
 
     private String status;
 }
+
+/**
+ * When you place @Data over a class, Lombok automatically injects the following annotations behind the scenes at compile time:
+ * @ToString: Generates a standard toString() method printing all class fields.
+ * @EqualsAndHashCode: Generates equals() and hashCode() implementations based on all non-static fields.
+ * @Getter: Generates getter methods for all fields.
+ * @Setter: Generates setter methods for all non-final fields.
+ * @RequiredArgsConstructor: Generates a constructor for all final fields and fields marked @NonNull.
+ */

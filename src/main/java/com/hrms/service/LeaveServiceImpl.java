@@ -10,6 +10,8 @@ import com.hrms.dto.LeaveResponseDTO;
 import com.hrms.entity.Employee;
 import com.hrms.entity.Leave;
 import com.hrms.enums.LeaveStatus;
+import com.hrms.exception.BusinessValidationException;
+import com.hrms.exception.ResourceNotFoundException;
 import com.hrms.repository.EmployeeRepository;
 import com.hrms.repository.LeaveRepository;
 
@@ -30,11 +32,11 @@ public class LeaveServiceImpl implements LeaveService {
         Employee employee = employeeRepository
                 .findByEmail(employeeEmail)
                 .orElseThrow(() ->
-                        new RuntimeException("Employee not found"));
+                        new ResourceNotFoundException("Employee not found"));
 
         // Basic Validation
         if (request.getEndDate().isBefore(request.getStartDate())) {
-            throw new RuntimeException(
+            throw new BusinessValidationException(
                     "End date cannot be before start date");
         }
 
@@ -61,7 +63,7 @@ public class LeaveServiceImpl implements LeaveService {
         Employee employee = employeeRepository
                 .findByEmail(employeeEmail)
                 .orElseThrow(() ->
-                        new RuntimeException("Employee not found"));
+                        new ResourceNotFoundException("Employee not found"));
 
         return leaveRepository.findByEmployee(employee)
                 .stream()
@@ -75,10 +77,10 @@ public LeaveResponseDTO approveLeave(Long leaveId) {
 
     Leave leave = leaveRepository.findById(leaveId)
             .orElseThrow(() ->
-                    new RuntimeException("Leave not found"));
+                    new ResourceNotFoundException("Leave not found"));
 
     if (leave.getStatus() != LeaveStatus.PENDING) {
-        throw new RuntimeException(
+        throw new BusinessValidationException(
                 "Only pending leave can be approved");
     }
 
@@ -95,10 +97,10 @@ public LeaveResponseDTO rejectLeave(Long leaveId) {
 
     Leave leave = leaveRepository.findById(leaveId)
             .orElseThrow(() ->
-                    new RuntimeException("Leave not found"));
+                    new ResourceNotFoundException("Leave not found"));
 
     if (leave.getStatus() != LeaveStatus.PENDING) {
-        throw new RuntimeException(
+        throw new BusinessValidationException(
                 "Only pending leave can be rejected");
     }
 

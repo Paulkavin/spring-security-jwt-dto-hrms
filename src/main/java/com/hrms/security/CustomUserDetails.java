@@ -3,12 +3,10 @@ package com.hrms.security;
 import com.hrms.entity.Employee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+
 /**
  * CustomUserDetails is an adapter. It converts your application's user model into the format that Spring Security understands.
  */
