@@ -40,7 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-
+        if (token.isBlank()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
 
             String username = jwtUtil.extractUsername(token);
@@ -48,17 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtil.validateToken(token, userDetails)) {
-                    //stores token
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities());
-                    
+                    // stores token
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+
                     authentication.setDetails(
                             new WebAuthenticationDetailsSource()
                                     .buildDetails(request));
@@ -72,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException e) {
             System.out.println("Invalid JWT : " + e.getMessage());
         }
-        //This line push forward to flow
+        // This line push forward to flow
         filterChain.doFilter(request, response);
     }
 }
@@ -80,49 +81,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 /**
  * 
  * Request
-
-↓
-
-Read Authorization Header
-
-↓
-
-Is Bearer Token?
-
-↓
-
-No → Continue
-
-↓
-
-Yes
-
-↓
-
-Extract JWT
-
-↓
-
-Extract Username
-
-↓
-
-Load User from Database
-
-↓
-
-Validate Token
-
-↓
-
-Create Authentication Object
-
-↓
-
-Store inside SecurityContext
-
-↓
-
-Continue Request
+ * 
+ * ↓
+ * 
+ * Read Authorization Header
+ * 
+ * ↓
+ * 
+ * Is Bearer Token?
+ * 
+ * ↓
+ * 
+ * No → Continue
+ * 
+ * ↓
+ * 
+ * Yes
+ * 
+ * ↓
+ * 
+ * Extract JWT
+ * 
+ * ↓
+ * 
+ * Extract Username
+ * 
+ * ↓
+ * 
+ * Load User from Database
+ * 
+ * ↓
+ * 
+ * Validate Token
+ * 
+ * ↓
+ * 
+ * Create Authentication Object
+ * 
+ * ↓
+ * 
+ * Store inside SecurityContext
+ * 
+ * ↓
+ * 
+ * Continue Request
  */
-

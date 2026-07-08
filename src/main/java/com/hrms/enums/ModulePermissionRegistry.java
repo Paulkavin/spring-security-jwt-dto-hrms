@@ -5,7 +5,7 @@ public class ModulePermissionRegistry {
 
     static{
         //List.of() creates unmodifiable lists.
-        EXTRA_OPERATIONS.put(ModuleEnum.LEAVE, List.of("APPROVE","REJECT"));
+        EXTRA_OPERATIONS.put(ModuleEnum.LEAVE, List.of("APPROVE","REJECT","READ_OWN"));
         EXTRA_OPERATIONS.put(ModuleEnum.PAYROLL,
                 List.of("PROCESS", "LOCK"));
 

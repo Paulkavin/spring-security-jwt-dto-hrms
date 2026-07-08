@@ -2,6 +2,8 @@ package com.hrms.controller;
 
 import com.hrms.dto.LoginRequestDTO;
 import com.hrms.dto.LoginResponseDTO;
+import com.hrms.dto.RefreshTokenRequestDTO;
+import com.hrms.dto.RefreshTokenResponseDTO;
 import com.hrms.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,11 @@ public class AuthController {
 
         return authService.login(dto);
 
+    }
+
+    @PostMapping("/refresh")
+    public RefreshTokenResponseDTO refreshToken(@RequestBody RefreshTokenRequestDTO dto){
+        return authService.refreshToken(dto);
     }
 
 }

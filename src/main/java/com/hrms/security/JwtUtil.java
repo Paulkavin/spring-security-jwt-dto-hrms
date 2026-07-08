@@ -16,28 +16,69 @@ import io.jsonwebtoken.security.Keys;
 import java.util.function.Function;
 
 @Component
-//job of this class to create token alone
+// job of this class to create token alone
 public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secretKey;
 
     @Value("${jwt.expiration}")
-    private long jwtExpiration;
+    private long accessTokenExpiration;
+    @Value("${jwt.refresh-expiration}")
+    private long refreshTokenExpiration;
 
-     public String generateToken(String username) {
-        //Key(String) -> Bytes -> Key Object by UTf-8 encoding
+    public String generateAccessToken(String username) {
+        return generateToken(username, accessTokenExpiration, "ACCESS");
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, refreshTokenExpiration, "REFRESH");
+    }
+
+    private String generateToken(
+            String username,
+            long expiration,
+            String tokenType) {
+
         SecretKey key = getSigningKey();
 
         return Jwts.builder()
-                .subject(username)//sub
-                .issuedAt(new Date())//iat
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .subject(username)
+                .claim("type", tokenType)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key)
-                .compact();//combines into final JWT String
+                .compact();
+
     }
 
-    
+    public String extractTokenType(String token) {
+
+        return extractClaim(token, claims -> claims.get("type", String.class));
+
+    }
+
+    public boolean isRefreshToken(String token) {
+
+        return "REFRESH".equals(
+                extractTokenType(token));
+
+    }
+
+    /*
+     * public String generateToken(String username) {
+     * // Key(String) -> Bytes -> Key Object by UTf-8 encoding
+     * SecretKey key = getSigningKey();
+     * 
+     * return Jwts.builder()
+     * .subject(username)// sub
+     * .issuedAt(new Date())// iat
+     * .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+     * .signWith(key)
+     * .compact();// combines into final JWT String
+     * }
+     */
+
     /**
      * Extract Username (sub claim)
      */
@@ -45,11 +86,11 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-     /**
+    /**
      * Generic Claim Extractor
      */
     public <T> T extractClaim(String token,
-                              Function<Claims, T> claimsResolver) {
+            Function<Claims, T> claimsResolver) {
 
         Claims claims = extractAllClaims(token);
 
@@ -73,8 +114,9 @@ public class JwtUtil {
      * Check Token Expiry
      */
     public boolean isTokenExpired(String token) {
-        
-        //Claims::getExpiration - This is a method reference, a shorthand way in Java to call an existing method.
+
+        // Claims::getExpiration - This is a method reference, a shorthand way in Java
+        // to call an existing method.
         Date expiration = extractClaim(token, Claims::getExpiration);
 
         return expiration.before(new Date());
@@ -89,7 +131,7 @@ public class JwtUtil {
      * Validate JWT
      */
     public boolean validateToken(String token,
-                                 UserDetails userDetails) {
+            UserDetails userDetails) {
 
         String username = extractUsername(token);
 

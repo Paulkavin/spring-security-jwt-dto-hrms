@@ -1,10 +1,11 @@
 package com.hrms.dto;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class LoginResponseDTO {
+public class RefreshTokenResponseDTO {
     private String accessToken;
-    private String refreshToken;
     private String tokenType;
 }
