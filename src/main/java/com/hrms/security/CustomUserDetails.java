@@ -59,6 +59,10 @@ public Collection<? extends GrantedAuthority> getAuthorities() {
     public boolean isEnabled() {
         return "ACTIVE".equalsIgnoreCase(employee.getStatus());
     }
+
+    public Employee getEmployee(){
+        return employee;
+    }
 }
 
 /* New System

@@ -15,79 +15,79 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-//This class loads the user for spring.To check username(mail)
+// This class loads the user for spring.To check username(mail)
 /**
- * CustomUserDetailsService loads the user from the database and converts the Employee into a UserDetails object that Spring Security understands.
+ * CustomUserDetailsService loads the user from the database and converts the
+ * Employee into a UserDetails object that Spring Security understands.
  */
 public class CustomUserDetailsService
-        implements UserDetailsService {
+                implements UserDetailsService {
 
-    private final EmployeeRepository employeeRepository;
+        private final EmployeeRepository employeeRepository;
 
-    @Override
-    //username = mail by spring
-    public UserDetails loadUserByUsername(String username)
-            throws UsernameNotFoundException {
+        
 
-        Employee employee = employeeRepository
-                .findByEmail(username)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found"));
+        @Override
+        // username = mail by spring
+        public UserDetails loadUserByUsername(String username)
+                        throws UsernameNotFoundException {
 
-        // return new CustomUserDetails(employee) with duplicates (if set used);
-        // List<GrantedAuthority> authorities = new ArrayList<>();
-           Set<GrantedAuthority> authorities = new HashSet<>();    
-    
-   //Role Authorites
-    employee.getRoles().forEach(role -> {
+                Employee employee = employeeRepository
+                                .findByEmail(username)
+                                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-    authorities.add(
-            new SimpleGrantedAuthority("ROLE_" + role.getName())
-    );
+                // return new CustomUserDetails(employee) with duplicates (if set used);
+                // List<GrantedAuthority> authorities = new ArrayList<>();
+                Set<GrantedAuthority> authorities = new HashSet<>();
 
-    role.getPermissions().forEach(permission -> {
+                // Role Authorites
+                employee.getRoles().forEach(role -> {
 
-        /* 
-        String authority =
-                permission.getModule().getName()
-                        + "_"
-                        + permission.getAction();
-        */
-        String authority =permission.getAuthority();
-        authorities.add(
-                new SimpleGrantedAuthority(authority)
-        );
+                        authorities.add(
+                                        new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
-    });
+                        role.getPermissions().forEach(permission -> {
 
-});
+                                /*
+                                 * String authority =
+                                 * permission.getModule().getName()
+                                 * + "_"
+                                 * + permission.getAction();
+                                 */
+                                String authority = permission.getAuthority();
+                                authorities.add(
+                                                new SimpleGrantedAuthority(authority));
 
-// Direct Permissions
-        employee.getDirectPermissions().forEach(permission -> {
+                        });
 
-        authorities.add(
-            new SimpleGrantedAuthority(permission.getAuthority())
-    );
+                });
 
-});
+                // Direct Permissions
+                employee.getDirectPermissions().forEach(permission -> {
 
-authorities.forEach(a -> System.out.println(a.getAuthority()));
-return new CustomUserDetails(employee, authorities);
+                        authorities.add(
+                                        new SimpleGrantedAuthority(permission.getAuthority()));
 
-    }
+                });
+
+                authorities.forEach(a -> System.out.println(a.getAuthority()));
+                return new CustomUserDetails(employee, authorities);
+
+        }
 
 }
 
-/**Latest Flow
+/**
+ * Latest Flow
  * User Login
-      ↓
-Load Role Permissions
-      +
-Load Employee Direct Permissions
-      ↓
-Merge
-      ↓
-JWT
-      ↓
-@PreAuthorize()
+ * ↓
+ * Load Role Permissions
+ * +
+ * Load Employee Direct Permissions
+ * ↓
+ * Merge
+ * ↓
+ * JWT
+ * ↓
+ * @PreAuthorize()
  */

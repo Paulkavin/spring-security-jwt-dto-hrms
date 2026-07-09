@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.hrms.audit.mapper.EmployeeAuditSnapshotMapper;
 import com.hrms.dto.EmployeeRequestDTO;
 import com.hrms.dto.EmployeeResponseDTO;
 import com.hrms.entity.Employee;
@@ -23,6 +24,7 @@ import com.hrms.events.EmployeeCreatedEvent;
 import com.hrms.exception.DuplicateResourceException;
 import com.hrms.exception.ResourceNotFoundException;
 import com.hrms.repository.RoleRepository;
+import com.hrms.snapshot.EmployeeAuditSnapshot;
 
 @Service
 @RequiredArgsConstructor // Alternate to @Autowired
@@ -32,6 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final EmployeeAuditSnapshotMapper snapshotMapper;
 
     private Employee mapToEntity(EmployeeRequestDTO dto) {
         return Employee.builder().firstName(dto.getFirstName())
@@ -80,17 +83,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee savedEmployee = employeeRepository.save(employee);
 
         eventPublisher.publishEvent(
-            new EmployeeCreatedEvent(
-                savedEmployee.getId(),
-                savedEmployee.getFirstName(),
-                savedEmployee.getLastName(),
-                savedEmployee.getEmail(),
-                savedEmployee.getDepartment(),
-                savedEmployee.getPhone(),
-                savedEmployee.getSalary(),
-                savedEmployee.getJoiningDate(),
-                savedEmployee.getStatus()
-        ));
+                new EmployeeCreatedEvent(
+                        savedEmployee.getId(),
+                        savedEmployee.getFirstName(),
+                        savedEmployee.getLastName(),
+                        savedEmployee.getEmail(),
+                        savedEmployee.getDepartment(),
+                        savedEmployee.getPhone(),
+                        savedEmployee.getSalary(),
+                        savedEmployee.getJoiningDate(),
+                        savedEmployee.getStatus()));
 
         return mapToResponse(savedEmployee);
 
@@ -115,6 +117,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponseDTO updateEmployeeId(Long id, EmployeeRequestDTO dto) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not Found"));
+        // Creating Old Snapshot
+        EmployeeAuditSnapshot oldSnapshot = snapshotMapper.toSnapshot(employee);
+
         employee.setFirstName(dto.getFirstName());
         employee.setLastName(dto.getLastName());
         employee.setDepartment(dto.getDepartment());
@@ -123,6 +128,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus(dto.getStatus());
 
         Employee updatedEmployee = employeeRepository.save(employee);
+        
+        // Creating new snapshot
+        EmployeeAuditSnapshot newSnapshot = snapshotMapper.toSnapshot(updatedEmployee);
         return mapToResponse(updatedEmployee);
 
     }
