@@ -3,6 +3,8 @@ package com.hrms.service;
 import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +23,11 @@ import java.util.Set;
 import java.util.HashSet;
 import com.hrms.entity.Role;
 import com.hrms.events.EmployeeCreatedEvent;
+import com.hrms.events.EmployeeUpdatedEvent;
 import com.hrms.exception.DuplicateResourceException;
 import com.hrms.exception.ResourceNotFoundException;
 import com.hrms.repository.RoleRepository;
+import com.hrms.security.CustomUserDetails;
 import com.hrms.snapshot.EmployeeAuditSnapshot;
 
 @Service
@@ -128,9 +132,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus(dto.getStatus());
 
         Employee updatedEmployee = employeeRepository.save(employee);
-        
+
         // Creating new snapshot
         EmployeeAuditSnapshot newSnapshot = snapshotMapper.toSnapshot(updatedEmployee);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails currentUser = (CustomUserDetails) authentication.getPrincipal();
+        Long performedByEmployeeId = currentUser.getEmployee().getId();
+        String performedByUsername = currentUser.getUsername();
+        // Publishing Event
+        eventPublisher.publishEvent(
+
+                new EmployeeUpdatedEvent(
+
+                        oldSnapshot,
+
+                        newSnapshot,
+
+                        performedByEmployeeId,
+
+                        performedByUsername
+
+                )
+
+        );
+
         return mapToResponse(updatedEmployee);
 
     }
